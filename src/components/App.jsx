@@ -6,13 +6,12 @@ import { Wrap } from './DefaultStylse.styled';
 import { nanoid } from 'nanoid';
 import { InputFind } from './Input/InputFind';
 
-
 import { Contacts } from './Contacts/Contacts';
 
 export class App extends Component {
   state = {
     contacts: [],
-   
+    filter: '',
   };
 
   addContact = data => {
@@ -23,30 +22,47 @@ export class App extends Component {
     this.setState(prev => ({
       contacts: [...prev.contacts, newContact],
     }));
-    // console.log(this.state);
   };
 
   handelDel = id => {
     this.setState(prev => ({
-      contacts: prev.contacts.filter((contact) => contact.id !== id)
+      contacts: prev.contacts.filter(contact => contact.id !== id),
     }));
   };
 
-// findId =id=>{
+  nameForFilter = e => {
+    this.setState({ filter: e.target.value });
+  };
+  cangeArreyContacts = () => {
+    const { filter, contacts } = this.state;
+    if (filter.length > 0) {
+      return contacts.filter(contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase().trim())
+      );
+    } else {
+      return contacts;
+    }
+  };
 
-// }
-
+  onDeleteContact = idContact => {
+    this.setState(prev => ({
+      contacts: prev.contacts.filter(contact => contact.id !== idContact),
+    }));
+  };
 
   render() {
     return (
       <>
         <Title text="Phonebook" />
         <Wrap>
-          <InputName cont={this.state.contacts} send={this.addContact} />
+          <InputName contact={this.state.contacts} send={this.addContact} />
         </Wrap>
         <Title text="Contscts" />
-        <InputFind />
-        <Contacts contact={this.state.contacts} />
+        <InputFind filter={this.state.filter} find={this.nameForFilter} />
+        <Contacts
+          contact={this.cangeArreyContacts()}
+          onDelete={this.onDeleteContact}
+        />
       </>
     );
   }

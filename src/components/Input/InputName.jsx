@@ -1,10 +1,15 @@
 import { Component } from 'react';
 import { Input } from './inputName.styled';
 import { Label } from './inputName.styled';
-// import { nanoid } from 'nanoid';
+import PropTypes from 'prop-types';
+import { Button } from 'components/Button/Button';
 
-import { ButtonAdd } from 'components/Button/ButtonAdd';
 export class InputName extends Component {
+  PropTypes = {
+    contact: PropTypes.arrayOf(PropTypes.shape),
+    send: PropTypes.func.isRequired,
+  };
+
   state = {
     name: '',
     number: '',
@@ -17,8 +22,24 @@ export class InputName extends Component {
 
   handelSubmit = e => {
     e.preventDefault();
-    this.props.send({ ...this.state });
-    this.setState({ name: '', number: '' });
+
+    const { contact } = this.props;
+    if (contact.length > 0) {
+      const match = contact.filter(
+        contact =>
+          contact.name === this.state.name &&
+          contact.number === this.state.number
+      );
+      if (match.length > 0) {
+        alert(`${this.state.name} already in contacts!!!`);
+      } else {
+        if (this.state.name !== '') this.props.send({ ...this.state });
+        this.setState({ name: '', number: '' });
+      }
+    } else {
+      if (this.state.name !== '') this.props.send({ ...this.state });
+      this.setState({ name: '', number: '' });
+    }
   };
 
   render() {
@@ -49,8 +70,7 @@ export class InputName extends Component {
             value={number}
           />
         </Label>
-        <ButtonAdd type="submit" onClicked={this.handelSubmit} />
-        
+        <Button onClicked={this.handelSubmit} text="Add contact" />
       </>
     );
   }
